@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Data-Dmap
-version:             0.01
+version:             0.04
 abstract:            just like map, but on deep data structures
 license:             perl
 author:              
