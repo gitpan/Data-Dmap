@@ -2,7 +2,7 @@ NAME
     Data::Dmap - just like map, but on deep data structures
 
 VERSION
-    Version 0.04
+    Version 0.05
 
 SYNOPSIS
     This module provides the single function "dmap" which carries out a
@@ -38,6 +38,7 @@ SYNOPSIS
 
 EXPORT
     "dmap" - the dmap function that does deep in-place mapping
+    "cut" - a function for stopping recursion.
 
 SUBROUTINES/METHODS
   "dmap"
@@ -103,6 +104,30 @@ SUBROUTINES/METHODS
         # }
         # (My own formatting above.)
 
+  "cut"
+    The "cut" routine stops recursion at any point and returns any data as
+    it is in place of the current node.
+
+   Examples
+        use Data::Dmap 'cut';
+        use Data::Dump 'pp';
+        
+    my $deep = {
+            level => 1,
+            data  => {
+                level => 2,
+                data => {
+                    level => 3
+                }
+            }
+        };
+        
+    pp dmap { cut('stop') if ref eq 'HASH' and $_->{level} == 2} $deep;
+
+        # Prints:
+        #
+        # { data => { data => "stop", level => 2 }, level => 1 }
+
 AUTHOR
     Michael Zedeler, "<michael@zedeler.dk>"
 
@@ -142,7 +167,16 @@ SUPPORT
 
         <http://search.cpan.org/dist/Data-Dmap/>
 
-ACKNOWLEDGEMENTS
+SEE ALSO
+    Data::Rmap, Data::Visitor, Data::Transformer, Data::Visitor, Data::Walk.
+
+TODO
+    Some kind of option making it possible to traverse objects with
+    Class::MOP metaclasses, so we can avoid breaking encapsulation.
+    Options to provide more information about the current node to the
+    callback handler, such as path, depth and data types. Should not affect
+    performance if not used.
+
 LICENSE AND COPYRIGHT
     Copyright 2010 Michael Zedeler.
 
@@ -151,4 +185,14 @@ LICENSE AND COPYRIGHT
     by the Free Software Foundation; or the Artistic License.
 
     See http://dev.perl.org/licenses/ for more information.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 322:
+        Unknown directive: =over1
+
+    Around line 324:
+        '=item' outside of any '=over'
 
