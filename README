@@ -2,7 +2,7 @@ NAME
     Data::Dmap - just like map, but on deep data structures
 
 VERSION
-    Version 0.05
+    Version 0.07.
 
 SYNOPSIS
     This module provides the single function "dmap" which carries out a
@@ -36,11 +36,12 @@ SYNOPSIS
         # Prints
         # barf
 
-EXPORT
-    "dmap" - the dmap function that does deep in-place mapping
-    "cut" - a function for stopping recursion.
+EXPORTS
+    "dmap" (always exported) - the dmap function that does deep in-place
+    mapping
+    "cut" (optional) - a function for stopping recursion.
 
-SUBROUTINES/METHODS
+SUBROUTINES
   "dmap"
     This function works like "map" - it takes an expression followed by a
     list, evaluates the expression on each member of the list and returns
@@ -80,6 +81,21 @@ SUBROUTINES/METHODS
         use Data::Dump 'pp';
         
     pp dmap { return bless $_, 'thingy' if ref eq 'HASH'; $_ } [ 1, "hello", { a => 1 } ];
+        
+    # Prints:
+        # [1, "hello", bless({ a => 1 }, "thingy")]
+
+    "dmap" understands what you want, if you return nothing (as opposed to
+    "undef") when evaluating the expression for a hash key:
+
+        use Data::Dmap;
+        use Data::Dump 'pp;
+
+        my $characters = { main => 'pooh', secondary => 'piglet' };
+        pp dmap { return if $_ eq "piglet"; $_ } $characters;
+        
+    # Prints:
+        # { main => "pooh" }
 
     Because the output from the expression is being traversed, you can use
     "dmap" to generate data structures:
@@ -185,14 +201,4 @@ LICENSE AND COPYRIGHT
     by the Free Software Foundation; or the Artistic License.
 
     See http://dev.perl.org/licenses/ for more information.
-
-POD ERRORS
-    Hey! The above document had some coding errors, which are explained
-    below:
-
-    Around line 322:
-        Unknown directive: =over1
-
-    Around line 324:
-        '=item' outside of any '=over'
 

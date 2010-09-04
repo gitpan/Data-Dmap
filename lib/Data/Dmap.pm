@@ -17,11 +17,11 @@ Data::Dmap - just like map, but on deep data structures
 
 =head1 VERSION
 
-Version 0.06.
+Version 0.07.
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -56,17 +56,17 @@ C<map>-like operation on deep data structures.
     # Prints
     # barf
 
-=head1 EXPORT
+=head1 EXPORTS
 
 =over
 
-=item C<dmap> - the dmap function that does deep in-place mapping
+=item C<dmap> (always exported) - the dmap function that does deep in-place mapping
 
-=item C<cut> - a function for stopping recursion.
+=item C<cut> (optional) - a function for stopping recursion.
 
 =back
 
-=head1 SUBROUTINES/METHODS
+=head1 SUBROUTINES
 
 =head2 C<dmap>
 
@@ -108,7 +108,22 @@ Replace all hash refs with some C<$object> of class C<thingy>.
     use Data::Dump 'pp';
     
     pp dmap { return bless $_, 'thingy' if ref eq 'HASH'; $_ } [ 1, "hello", { a => 1 } ];
+    
+    # Prints:
+    # [1, "hello", bless({ a => 1 }, "thingy")]
 
+C<dmap> understands what you want, if you return nothing (as opposed to C<undef>) when
+evaluating the expression for a hash key:
+
+    use Data::Dmap;
+    use Data::Dump 'pp;
+
+    my $characters = { main => 'pooh', secondary => 'piglet' };
+    pp dmap { return if $_ eq "piglet"; $_ } $characters;
+    
+    # Prints:
+    # { main => "pooh" }
+    
 Because the output from the expression is being traversed, you can use C<dmap> to generate
 data structures:
 
@@ -226,7 +241,7 @@ sub _dmap {
                                         if(@res) {
                                             $val->[$i] = $res[0];
                                         } else {
-                                            print splice @$val, $i, 1;
+                                            splice @$val, $i, 1;
                                         }
                                     }
                                     $i++;
@@ -319,7 +334,7 @@ L<Data::Rmap>, L<Data::Visitor>, L<Data::Transformer>, L<Data::Visitor>, L<Data:
 
 =head1 TODO
 
-=over1
+=over
 
 =item Some kind of option making it possible to traverse objects with L<Class::MOP>
 metaclasses, so we can avoid breaking encapsulation.
